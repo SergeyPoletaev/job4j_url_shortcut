@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_create-table-url
+      author: Sergey Poletaev
+      changes:
+        - createTable:
+            tableName: url
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: link
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: code
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: total
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                  defaultValue: '0'
