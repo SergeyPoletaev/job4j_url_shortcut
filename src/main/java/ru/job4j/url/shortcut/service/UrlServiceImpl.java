@@ -9,18 +9,16 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.job4j.url.shortcut.model.Url;
 import ru.job4j.url.shortcut.repository.UrlRepository;
+import ru.job4j.url.shortcut.repository.UrlRepositoryQuery;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class UrlServiceImpl implements UrlService {
-    private static final String INCREMENT_TOTAL_BY_CODE = "UPDATE url SET total = total + 1 WHERE code = :code";
-
     private final UrlRepository urlRepository;
-    private final EntityManager em;
+    private final UrlRepositoryQuery urlRepositoryQuery;
 
     @Override
     public Url save(Url url) {
@@ -31,10 +29,7 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     public Optional<Url> findByCode(String code) {
-        return em.createNativeQuery(INCREMENT_TOTAL_BY_CODE)
-                .setParameter("code", code)
-                .executeUpdate() > 0
-                ? urlRepository.findByCode(code) : Optional.empty();
+        return urlRepositoryQuery.findByCode(code);
     }
 
     @Transactional(readOnly = true)
