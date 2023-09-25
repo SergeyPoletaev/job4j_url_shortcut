@@ -1,4 +1,16 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      base-path: /manegment
+      exposure:
+        include: "health"
 spring:
+  application:
+    name: job4j-url-shortcut
+    description: Сервис предоставляющий API для конвертации URL адресов в короткую ссылку
   datasource:
     url: ${DB_DEFAULT_URL}
     username: ${DB_DEFAULT_USERNAME}
