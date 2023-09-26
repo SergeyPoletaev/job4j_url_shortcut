@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:url_shortcut;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  jpa:
+    open-in-view: false
+    database: h2
+    show-sql: true
+    properties:
+      hibernate:
+        order_by:
+          default_null_ordering: last
+        ddl-auto: validate
+        dialect: org.hibernate.dialect.H2Dialect
+        show-sql: true
+        temp:
+          use_jdbc_metadata_defaults: false
+  main:
+    banner-mode: off
+logging:
+  level:
+    root: OFF
+    org:
+      springframework: OFF
+server:
+  error:
+    include-message: always
