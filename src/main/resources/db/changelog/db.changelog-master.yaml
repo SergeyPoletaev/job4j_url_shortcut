@@ -1,4 +1,16 @@
 databaseChangeLog:
   - include:
-      file: changes/001_create-table-url.yaml
+      file: changes/001_create-table-client.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/002_create-table-url.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/003_create-table-role.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/004_create-table-client_role.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/005_insert-roles-into-table-role.sql
       relativeToChangelogFile: true

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 001_create-table-url
+      id: 002_create-table-url
       author: Sergey Poletaev
       changes:
         - createTable:
@@ -31,3 +31,15 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                   defaultValue: '0'
+              - column:
+                  name: client_id
+                  type: BIGINT
+        - addForeignKeyConstraint:
+            baseColumnNames: client_id
+            baseTableName: url
+            constraintName: fk_url_client_id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: client
+            validate: true

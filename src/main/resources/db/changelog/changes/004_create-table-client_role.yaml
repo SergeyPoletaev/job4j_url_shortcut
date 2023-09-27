@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004_create-table-client_role
+      author: Sergey Poletaev
+      changes:
+        - createTable:
+            tableName: client_role
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: client_id
+                  type: BIGINT
+              - column:
+                  name: role_id
+                  type: BIGINT
+        - addForeignKeyConstraint:
+            baseColumnNames: client_id
+            baseTableName: client_role
+            constraintName: fk_client_role_client
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: client
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: role_id
+            baseTableName: client_role
+            constraintName: fk_client_role_role
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: role
+            validate: true
+

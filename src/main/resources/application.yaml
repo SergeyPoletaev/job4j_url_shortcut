@@ -4,7 +4,7 @@ management:
       show-details: always
   endpoints:
     web:
-      base-path: /manegment
+      base-path: /management
       exposure:
         include: "health"
 spring:
@@ -51,4 +51,8 @@ server:
       enabled: true
       charset: UTF-8
       force: true
+token:
+  issuer: corporation-horns-and-hooves
+  public-key: public_key.der
+  private-key: private_key.der
 
