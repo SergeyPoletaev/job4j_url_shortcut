@@ -13,6 +13,7 @@ import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.Url;
 import ru.job4j.url.shortcut.repository.UrlRepository;
 import ru.job4j.url.shortcut.repository.UrlRepositoryQuery;
+import ru.job4j.url.shortcut.security.RoleTypes;
 
 import java.util.Optional;
 
@@ -42,9 +43,9 @@ public class UrlServiceImpl implements UrlService {
         User authUser = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Long clientId = Long.parseLong(authUser.getUsername());
         boolean checkAuthority = authUser.getAuthorities().stream()
-                .anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(ga -> ga.getAuthority().equals(RoleTypes.ADMIN));
         return checkAuthority
                 ? urlRepository.findAll(pageable)
-                : urlRepository.findByClient(new Client().setId(clientId), pageable);
+                : urlRepository.findAllByClient(new Client().setId(clientId), pageable);
     }
 }

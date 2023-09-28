@@ -10,5 +10,5 @@ import ru.job4j.url.shortcut.model.Url;
 @Repository
 public interface UrlRepository extends JpaRepository<Url, Long> {
 
-    Page<Url> findByClient(Client client, Pageable pageable);
+    Page<Url> findAllByClient(Client client, Pageable pageable);
 }

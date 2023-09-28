@@ -7,26 +7,38 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.Url;
+import ru.job4j.url.shortcut.repository.ClientRepository;
+import ru.job4j.url.shortcut.repository.UrlRepository;
 
-import javax.persistence.EntityManager;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Transactional
 class UrlServiceImplIntegratedWithRepositoryTest {
     @Autowired
     private UrlServiceImpl urlService;
     @Autowired
-    private EntityManager em;
+    private UrlRepository urlRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
     @BeforeEach
-    void cleanDb() {
-        em.createNativeQuery("DELETE FROM url").executeUpdate();
+    void ensurePrecondition() {
+        urlRepository.deleteAll();
+        clientRepository.deleteAll();
+        Client testClient = clientRepository.save(new Client().setSite("a").setLogin("b").setPassword("c"));
+        User user = new User(testClient.getId().toString(), "null", List.of());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(user, null, List.of());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
     @Test
@@ -42,7 +54,6 @@ class UrlServiceImplIntegratedWithRepositoryTest {
         String link = "https://220test.ru";
         Url url = new Url().setLink(link);
         urlService.save(url);
-        em.clear();
         Optional<Url> urlOpt = urlService.findByCode(url.getCode());
         assertThat(urlOpt.get().getLink()).isEqualTo(link);
         assertThat(urlOpt.get().getTotal()).isEqualTo(1L);

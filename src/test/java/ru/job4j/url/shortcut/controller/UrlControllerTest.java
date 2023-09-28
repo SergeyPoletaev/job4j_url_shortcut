@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.job4j.url.shortcut.model.Url;
@@ -30,7 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = UrlController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class UrlControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -40,6 +43,7 @@ class UrlControllerTest {
     private UrlService urlService;
 
     @Test
+    @WithMockUser
     void whenValidInputThenConvertReturns200() throws Exception {
         UrlDto urlDto = new UrlDto().setUrl("https://220test.ru");
         MvcResult mvcResult = mockMvc.perform(post("/convert")
@@ -56,6 +60,7 @@ class UrlControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenInvalidUrlThenConvertReturns400AndErrorResult() throws Exception {
         UrlDto urlDto = new UrlDto().setUrl("htt://220test.ru");
         MvcResult mvcResult = mockMvc.perform(post("/convert")
@@ -108,6 +113,7 @@ class UrlControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenValidInputThenGetStatisticReturns200() throws Exception {
         String pageNum = String.valueOf(0);
         String sizePage = String.valueOf(2);
@@ -129,6 +135,7 @@ class UrlControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenInvalidInputThenGetStatisticReturns400AndErrorResult() throws Exception {
         String pageNum = String.valueOf(1);
         String sizePage = String.valueOf(101);

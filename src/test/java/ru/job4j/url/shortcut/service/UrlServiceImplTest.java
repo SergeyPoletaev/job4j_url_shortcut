@@ -2,30 +2,33 @@ package ru.job4j.url.shortcut.service;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
+import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.Url;
 import ru.job4j.url.shortcut.repository.UrlRepository;
 import ru.job4j.url.shortcut.repository.UrlRepositoryQuery;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class UrlServiceImplTest {
-    @Mock
+    @MockBean
     private UrlRepository urlRepository;
-    @Mock
+    @MockBean
     private UrlRepositoryQuery urlRepositoryQuery;
-    @InjectMocks
-    private UrlServiceImpl urlService;
+    @Autowired
+    private UrlService urlService;
 
     @Test
+    @WithMockUser(value = "1")
     void save() {
         ArgumentCaptor<Url> argumentCaptor = ArgumentCaptor.forClass(Url.class);
         Url url = new Url().setLink("https://220test.ru");
@@ -42,9 +45,20 @@ class UrlServiceImplTest {
     }
 
     @Test
-    void findAll() {
+    @WithMockUser(value = "1", authorities = {"ROLE_ADMIN"})
+    void whenRoleIsAdminThenFindAll() {
         Pageable pageable = PageRequest.of(1, 1);
         urlService.findAll(pageable);
         verify(urlRepository).findAll(pageable);
+    }
+
+    @Test
+    @WithMockUser(value = "1")
+    void whenRoleNotAdminThenFindByClient() {
+        Pageable pageable = PageRequest.of(1, 1);
+        ArgumentCaptor<Client> argumentCaptor = ArgumentCaptor.forClass(Client.class);
+        urlService.findAll(pageable);
+        verify(urlRepository).findAllByClient(argumentCaptor.capture(), eq(pageable));
+        assertThat(argumentCaptor.getValue().getId()).isEqualTo(1L);
     }
 }
