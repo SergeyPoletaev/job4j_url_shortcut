@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
+@SpringBootTest(classes = UrlServiceImpl.class)
 class UrlServiceImplTest {
     @MockBean
     private UrlRepository urlRepository;

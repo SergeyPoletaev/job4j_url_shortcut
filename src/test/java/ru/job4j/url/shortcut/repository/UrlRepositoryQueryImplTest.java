@@ -4,7 +4,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import ru.job4j.url.shortcut.model.Url;
 
@@ -13,7 +14,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
+@Import(value = {UrlRepositoryQueryImpl.class})
 @Transactional
 class UrlRepositoryQueryImplTest {
     private static final String INSERT_INTO_TEST_DATA = "INSERT INTO url (link, code) VALUES (:link, :code)";
