@@ -46,16 +46,17 @@ class UrlControllerTest {
     @WithMockUser
     void whenValidInputThenConvertReturns200() throws Exception {
         UrlDto urlDto = new UrlDto().setUrl("https://220test.ru");
+        when(urlService.save(any(UrlDto.class))).thenReturn(new CodeDto());
         MvcResult mvcResult = mockMvc.perform(post("/convert")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(urlDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
-        ArgumentCaptor<Url> urlCaptor = ArgumentCaptor.forClass(Url.class);
+        ArgumentCaptor<UrlDto> urlCaptor = ArgumentCaptor.forClass(UrlDto.class);
         String actualResponseBody = mvcResult.getResponse().getContentAsString();
         verify(urlService).save(urlCaptor.capture());
-        assertThat(urlCaptor.getValue().getLink()).isEqualTo(urlDto.getUrl());
+        assertThat(urlCaptor.getValue().getUrl()).isEqualTo(urlDto.getUrl());
         assertThat(actualResponseBody).isEqualTo(objectMapper.writeValueAsString(new CodeDto()));
     }
 
@@ -69,7 +70,7 @@ class UrlControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
-        ArgumentCaptor<Url> urlCaptor = ArgumentCaptor.forClass(Url.class);
+        ArgumentCaptor<UrlDto> urlCaptor = ArgumentCaptor.forClass(UrlDto.class);
         String actualResponseBody = mvcResult.getResponse().getContentAsString();
         String expectedResponseBody =
                 """
@@ -118,7 +119,7 @@ class UrlControllerTest {
         String pageNum = String.valueOf(0);
         String sizePage = String.valueOf(2);
         Pageable pageable = PageRequest.of(Integer.parseInt(pageNum), Integer.parseInt(sizePage));
-        Page<Url> page = new PageImpl<>(List.of(new Url().setCode(randomAlphabetic(10)).setLink("https://220test.ru")));
+        Page<StatisticDto> page = new PageImpl<>(List.of(new StatisticDto().setUrl("https://220test.ru")));
         when(urlService.findAll(pageable)).thenReturn(page);
         MvcResult mvcResult = mockMvc.perform(get("/statistic")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +129,7 @@ class UrlControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String actualResponseBody = mvcResult.getResponse().getContentAsString();
-        List<StatisticDto> statistics = List.of(new StatisticDto().setUrl(page.stream().findFirst().orElseThrow().getLink()));
+        List<StatisticDto> statistics = List.of(page.stream().findFirst().orElseThrow());
         Page<StatisticDto> statisticDto = new PageImpl<>(statistics);
         verify(urlService).findAll(pageable);
         assertThat(actualResponseBody).isEqualTo(objectMapper.writeValueAsString(statisticDto));
@@ -140,7 +141,7 @@ class UrlControllerTest {
         String pageNum = String.valueOf(1);
         String sizePage = String.valueOf(101);
         Pageable pageable = PageRequest.of(Integer.parseInt(pageNum), Integer.parseInt(sizePage));
-        Page<Url> page = new PageImpl<>(List.of(new Url().setCode(randomAlphabetic(10)).setLink("https://220test.ru")));
+        Page<StatisticDto> page = new PageImpl<>(List.of(new StatisticDto().setUrl("https://220test.ru")));
         when(urlService.findAll(pageable)).thenReturn(page);
         MvcResult mvcResult = mockMvc.perform(get("/statistic")
                         .contentType(MediaType.APPLICATION_JSON)

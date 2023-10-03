@@ -9,10 +9,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.job4j.url.shortcut.mappers.UrlMapper;
 import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.Url;
+import ru.job4j.url.shortcut.model.dto.CodeDto;
+import ru.job4j.url.shortcut.model.dto.StatisticDto;
+import ru.job4j.url.shortcut.model.dto.UrlDto;
 import ru.job4j.url.shortcut.repository.UrlRepository;
-import ru.job4j.url.shortcut.repository.UrlRepositoryQuery;
 import ru.job4j.url.shortcut.security.RoleTypes;
 
 import java.util.Optional;
@@ -22,30 +25,35 @@ import java.util.Optional;
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class UrlServiceImpl implements UrlService {
     private final UrlRepository urlRepository;
-    private final UrlRepositoryQuery urlRepositoryQuery;
+    private final UrlMapper urlMapper;
 
     @Override
-    public Url save(Url url) {
+    public CodeDto save(UrlDto urlDto) {
         String code = RandomStringUtils.randomAlphabetic(10);
         String clientId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        url.setCode(code).setClient(new Client().setId(Long.parseLong(clientId)));
-        return urlRepository.save(url);
+        Url url = urlMapper.urlFromUrlDto(urlDto)
+                .setCode(code)
+                .setClient(new Client().setId(Long.parseLong(clientId)));
+        return urlMapper.urlToCodeDto(urlRepository.save(url));
     }
 
     @Override
     public Optional<Url> findByCode(String code) {
-        return urlRepositoryQuery.findByCode(code);
+        return urlRepository.updateTotal(code) > 0
+                ? urlRepository.findByCode(code)
+                : Optional.empty();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<Url> findAll(Pageable pageable) {
+    public Page<StatisticDto> findAll(Pageable pageable) {
         User authUser = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Long clientId = Long.parseLong(authUser.getUsername());
         boolean checkAuthority = authUser.getAuthorities().stream()
                 .anyMatch(ga -> ga.getAuthority().equals(RoleTypes.ADMIN));
-        return checkAuthority
+        Page<Url> page = checkAuthority
                 ? urlRepository.findAll(pageable)
                 : urlRepository.findAllByClient(new Client().setId(clientId), pageable);
+        return page.map(urlMapper::urlToStatisticDto);
     }
 }

@@ -35,9 +35,7 @@ public class UrlController {
     public ResponseEntity<CodeDto> convert(@RequestBody @Valid UrlDto urlDto,
                                            @AuthenticationPrincipal User user) {
         log.info("Регистрация URL ==> {} пользователем c id {}", urlDto.getUrl(), user.getUsername());
-        Url url = new Url().setLink(urlDto.getUrl());
-        urlService.save(url);
-        return ResponseEntity.ok().body(new CodeDto().setCode(url.getCode()));
+        return ResponseEntity.ok(urlService.save(urlDto));
     }
 
     @GetMapping("/redirect/{code}")
@@ -58,9 +56,6 @@ public class UrlController {
                                                            @Min(1) @Max(100) int sizePage,
                                                            @AuthenticationPrincipal User user) {
         log.info("Запрос статистики переходов от пользователя c id {}", user.getUsername());
-        Page<Url> page = urlService.findAll(PageRequest.of(pageNum, sizePage));
-        Page<StatisticDto> statisticDtoPage =
-                page.map(url -> new StatisticDto().setUrl(url.getLink()).setTotal(url.getTotal()));
-        return ResponseEntity.ok().body(statisticDtoPage);
+        return ResponseEntity.ok(urlService.findAll(PageRequest.of(pageNum, sizePage)));
     }
 }

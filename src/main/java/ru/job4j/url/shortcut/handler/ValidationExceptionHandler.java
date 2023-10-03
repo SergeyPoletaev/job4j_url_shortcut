@@ -1,4 +1,4 @@
-package ru.job4j.url.shortcut.hendler;
+package ru.job4j.url.shortcut.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

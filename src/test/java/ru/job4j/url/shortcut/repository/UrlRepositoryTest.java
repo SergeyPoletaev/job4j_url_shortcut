@@ -5,29 +5,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 import ru.job4j.url.shortcut.model.Url;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(value = {UrlRepositoryQueryImpl.class})
-@Transactional
-class UrlRepositoryQueryImplTest {
-    private static final String INSERT_INTO_TEST_DATA = "INSERT INTO url (link, code) VALUES (:link, :code)";
+class UrlRepositoryTest {
 
     @Autowired
-    private UrlRepositoryQuery urlRepositoryQuery;
-    @Autowired
-    private EntityManager em;
+    private UrlRepository urlRepository;
 
     @BeforeEach
     void cleanDb() {
-        em.createNativeQuery("DELETE FROM url").executeUpdate();
+        urlRepository.deleteAll();
     }
 
     @Test
@@ -35,12 +27,8 @@ class UrlRepositoryQueryImplTest {
         String code = RandomStringUtils.randomAlphabetic(10);
         String link = "https://220test.ru";
         Url expectedUrl = new Url().setLink(link).setCode(code).setTotal(1);
-        em.createNativeQuery(INSERT_INTO_TEST_DATA)
-                .setParameter("code", code)
-                .setParameter("link", link)
-                .executeUpdate();
-        em.clear();
-        Optional<Url> urlOpt = urlRepositoryQuery.findByCode(code);
+        urlRepository.save(expectedUrl);
+        Optional<Url> urlOpt = urlRepository.findByCode(code);
         assertThat(urlOpt.get().getLink()).isEqualTo(expectedUrl.getLink());
         assertThat(urlOpt.get().getTotal()).isEqualTo(expectedUrl.getTotal());
     }

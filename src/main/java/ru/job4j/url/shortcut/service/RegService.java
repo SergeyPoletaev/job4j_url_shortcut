@@ -1,8 +1,9 @@
 package ru.job4j.url.shortcut.service;
 
-import ru.job4j.url.shortcut.model.Client;
+import ru.job4j.url.shortcut.model.dto.CredentialsDto;
+import ru.job4j.url.shortcut.model.dto.RegistrationDto;
 
 public interface RegService {
 
-    Client save(Client cred);
+    CredentialsDto save(RegistrationDto registrationDto);
 }

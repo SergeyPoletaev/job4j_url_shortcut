@@ -1,4 +1,4 @@
-package ru.job4j.url.shortcut.hendler;
+package ru.job4j.url.shortcut.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

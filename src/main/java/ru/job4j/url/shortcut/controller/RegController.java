@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.dto.CredentialsDto;
 import ru.job4j.url.shortcut.model.dto.RegistrationDto;
 import ru.job4j.url.shortcut.service.RegService;
@@ -24,11 +23,6 @@ public class RegController {
     @PostMapping
     public ResponseEntity<CredentialsDto> registration(@RequestBody @Valid RegistrationDto regDto) {
         log.info("Регистрация нового пользователя ==> {} ", regDto.getSite());
-        Client cred = regService.save(new Client().setSite(regDto.getSite()));
-        return ResponseEntity.ok()
-                .body(new CredentialsDto()
-                        .setLogin(cred.getLogin())
-                        .setPassword(cred.getPassword())
-                        .setRegistration(cred.isRegistration()));
+        return ResponseEntity.ok(regService.save(regDto));
     }
 }

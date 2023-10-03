@@ -12,10 +12,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.Url;
+import ru.job4j.url.shortcut.model.dto.CodeDto;
+import ru.job4j.url.shortcut.model.dto.StatisticDto;
+import ru.job4j.url.shortcut.model.dto.UrlDto;
 import ru.job4j.url.shortcut.repository.ClientRepository;
 import ru.job4j.url.shortcut.repository.UrlRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,28 +45,27 @@ class UrlServiceImplIntegratedWithRepositoryTest {
 
     @Test
     void save() {
-        Url url = new Url().setLink("https://220test.ru");
-        urlService.save(url);
-        assertThat(url.getId()).isNotEqualTo(0);
-        assertThat(url.getCode().length()).isEqualTo(10);
+        UrlDto urlDto = new UrlDto().setUrl("https://220test.ru");
+        assertThat(urlService.save(urlDto).getCode().length()).isEqualTo(10);
     }
 
     @Test
     void findByCode() {
         String link = "https://220test.ru";
-        Url url = new Url().setLink(link);
-        urlService.save(url);
-        Optional<Url> urlOpt = urlService.findByCode(url.getCode());
+        UrlDto urlDto = new UrlDto().setUrl(link);
+        CodeDto codeDto = urlService.save(urlDto);
+        Optional<Url> urlOpt = urlService.findByCode(codeDto.getCode());
         assertThat(urlOpt.get().getLink()).isEqualTo(link);
         assertThat(urlOpt.get().getTotal()).isEqualTo(1L);
     }
 
     @Test
     void findAll() {
-        Url url = new Url().setLink("https://220test.ru");
-        urlService.save(url);
+        UrlDto urlDto = new UrlDto().setUrl("https://220test.ru");
+        urlService.save(urlDto);
         Pageable pageable = PageRequest.of(0, 1);
-        Page<Url> page = urlService.findAll(pageable);
-        assertThat(page.getContent()).isEqualTo(Collections.singletonList(url));
+        Page<StatisticDto> page = urlService.findAll(pageable);
+        assertThat(page.getContent().size()).isEqualTo(1);
+        assertThat(page.getContent().get(0).getUrl()).isEqualTo(urlDto.getUrl());
     }
 }
