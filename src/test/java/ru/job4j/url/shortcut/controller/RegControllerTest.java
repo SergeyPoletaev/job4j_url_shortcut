@@ -13,10 +13,12 @@ import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.dto.RegistrationDto;
 import ru.job4j.url.shortcut.repository.ClientRepository;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +40,8 @@ class RegControllerTest {
         RegistrationDto registrationDto = new RegistrationDto().setSite("https://yandex.ru");
         mockMvc.perform(post("/registration")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registrationDto)))
+                        .content(objectMapper.writeValueAsString(registrationDto))
+                        .with(anonymous()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.login").value(Matchers.hasLength(10)))
@@ -52,7 +55,8 @@ class RegControllerTest {
         RegistrationDto registrationDto = new RegistrationDto().setSite("https://yandex.ru");
         mockMvc.perform(post("/registration")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registrationDto)))
+                        .content(objectMapper.writeValueAsString(registrationDto))
+                        .with(anonymous()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.login").value(Matchers.nullValue(String.class)))

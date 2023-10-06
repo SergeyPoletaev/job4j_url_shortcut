@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @Setter
@@ -19,8 +22,6 @@ public class Url {
     private String link;
     private String code;
     private long total;
-    @ManyToOne
-    private Client client;
 
     @Override
     public boolean equals(Object o) {

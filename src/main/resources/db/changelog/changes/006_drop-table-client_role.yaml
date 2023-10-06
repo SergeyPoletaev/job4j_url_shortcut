@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006_drop-table-client_role
+      author: Sergey Poletaev
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: client_role
+

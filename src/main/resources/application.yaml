@@ -29,6 +29,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL95Dialect
         temp:
           use_jdbc_metadata_defaults: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/oauth2/jwks
 logging:
   level:
     root: INFO
@@ -51,8 +56,4 @@ server:
       enabled: true
       charset: UTF-8
       force: true
-token:
-  issuer: corporation-horns-and-hooves
-  public-key: public_key.der
-  private-key: private_key.der
 

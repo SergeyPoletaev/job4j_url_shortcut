@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007_drop-table-role
+      author: Sergey Poletaev
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: role
+

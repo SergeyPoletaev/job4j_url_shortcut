@@ -27,6 +27,8 @@ import java.util.Optional;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,13 +45,13 @@ class UrlControllerTest {
     private UrlService urlService;
 
     @Test
-    @WithMockUser
     void whenValidInputThenConvertReturns200() throws Exception {
         UrlDto urlDto = new UrlDto().setUrl("https://220test.ru");
         when(urlService.save(any(UrlDto.class))).thenReturn(new CodeDto());
         MvcResult mvcResult = mockMvc.perform(post("/convert")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(urlDto)))
+                        .content(objectMapper.writeValueAsString(urlDto))
+                        .with(jwt()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -61,12 +63,12 @@ class UrlControllerTest {
     }
 
     @Test
-    @WithMockUser
     void whenInvalidUrlThenConvertReturns400AndErrorResult() throws Exception {
         UrlDto urlDto = new UrlDto().setUrl("htt://220test.ru");
         MvcResult mvcResult = mockMvc.perform(post("/convert")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(urlDto)))
+                        .content(objectMapper.writeValueAsString(urlDto))
+                        .with(jwt()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -87,7 +89,8 @@ class UrlControllerTest {
         String code = randomAlphabetic(10);
         when(urlService.findByCode(code)).thenReturn(Optional.of(url));
         mockMvc.perform(get("/redirect/{code}", code)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(anonymous()))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().stringValues("Location", url.getLink()))
@@ -101,7 +104,8 @@ class UrlControllerTest {
         String code = "QwEr";
         when(urlService.findByCode(code)).thenReturn(Optional.of(url));
         MvcResult mvcResult = mockMvc.perform(get("/redirect/{code}", code)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(anonymous()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -124,7 +128,8 @@ class UrlControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/statistic")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("pageNum", pageNum)
-                        .param("sizePage", sizePage))
+                        .param("sizePage", sizePage)
+                        .with(jwt()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -146,7 +151,8 @@ class UrlControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/statistic")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("pageNum", pageNum)
-                        .param("sizePage", sizePage))
+                        .param("sizePage", sizePage)
+                        .with(jwt()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();

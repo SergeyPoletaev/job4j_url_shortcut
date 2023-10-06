@@ -14,3 +14,12 @@ databaseChangeLog:
   - include:
       file: changes/005_insert-roles-into-table-role.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/006_drop-table-client_role.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/007_drop-table-role.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/008_alter-table-url.yaml
+      relativeToChangelogFile: true

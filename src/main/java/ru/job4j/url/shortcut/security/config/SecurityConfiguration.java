@@ -2,46 +2,43 @@ package ru.job4j.url.shortcut.security.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.job4j.url.shortcut.security.filter.JWTAuthorizationFilter;
+import ru.job4j.url.shortcut.service.ClientService;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final JWTAuthorizationFilter filter;
-    private final RoleHierarchy roleHierarchy;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .httpBasic().disable()
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http.authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .antMatchers("/registration").permitAll()
+                                .antMatchers("/redirect/**").permitAll()
+                                .antMatchers("/**").authenticated())
                 .csrf().disable()
-                .authorizeRequests()
-                .expressionHandler(webSecurityExpressionHandler())
-                .antMatchers("/registration").permitAll()
-                .antMatchers("/redirect/**").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/management/health").permitAll()
-                .antMatchers("/**").authenticated()
+                .formLogin()
                 .and()
-                .exceptionHandling()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2ResourceServer((OAuth2ResourceServerConfigurer::jwt))
                 .build();
     }
 
-    public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
-        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy);
-        return expressionHandler;
+    @Bean
+    public UserDetailsService userDetailsService(ClientService clientService) {
+        return username -> clientService.findByLogin(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(String.format("Пользователь %s не найден", username)));
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

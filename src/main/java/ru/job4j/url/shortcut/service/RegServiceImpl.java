@@ -11,18 +11,12 @@ import ru.job4j.url.shortcut.model.Client;
 import ru.job4j.url.shortcut.model.dto.CredentialsDto;
 import ru.job4j.url.shortcut.model.dto.RegistrationDto;
 import ru.job4j.url.shortcut.repository.RegRepository;
-import ru.job4j.url.shortcut.security.RoleTypes;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegServiceImpl implements RegService {
     private final RegRepository regRepository;
-    private final RoleService roleService;
     private final PasswordEncoder encoder;
     private final ClientMapper urlMapper;
 
@@ -30,20 +24,16 @@ public class RegServiceImpl implements RegService {
     public CredentialsDto save(RegistrationDto regDto) {
         String login = RandomStringUtils.randomAlphabetic(10);
         String password = RandomStringUtils.randomAlphabetic(10);
-        String roleRegNotation = RoleTypes.USER.replace("ROLE_", "").toLowerCase(Locale.ROOT);
         Client client = urlMapper.clientFromRegistrationDto(regDto);
         try {
             regRepository.save(client.setLogin(login)
-                            .setPassword(encoder.encode(password))
-                            .setRoles(List.of(roleService.findByName(roleRegNotation).orElseThrow())))
+                            .setPassword(encoder.encode(password)))
                     .setRegistration(true);
-        } catch (NoSuchElementException ex) {
-            log.error("не найдена роль {} в БД " + ex.getMessage(), client.getSite(), ex);
         } catch (DataIntegrityViolationException ex) {
-            log.error("попытка повторной регистрации клиента {} " + ex.getMessage(), roleRegNotation, ex);
+            log.error("попытка повторной регистрации клиента {} " + ex.getMessage(), regDto.getSite(), ex);
         }
         if (!client.isRegistration()) {
-            client.setLogin(null).setPassword(null).setRoles(null);
+            client.setLogin(null).setPassword(null);
         } else {
             client.setLogin(login).setPassword(password);
         }

@@ -27,7 +27,3 @@ logging:
 server:
   error:
     include-message: always
-token:
-  issuer: corporation-horns-and-hooves
-  public-key: public_key.der
-  private-key: private_key.der

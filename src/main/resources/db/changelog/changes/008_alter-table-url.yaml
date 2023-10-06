@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008_alter-table-url
+      author: Sergey Poletaev
+      changes:
+        - dropColumn:
+            columnName: client_id
+            tableName: url
+
