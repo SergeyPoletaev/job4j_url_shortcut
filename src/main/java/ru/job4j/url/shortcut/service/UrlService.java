@@ -16,4 +16,6 @@ public interface UrlService {
     Optional<Url> findByCode(String code);
 
     Page<StatisticDto> findAll(Pageable pageable);
+
+    int updateTotal(String code);
 }

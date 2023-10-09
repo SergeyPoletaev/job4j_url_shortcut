@@ -42,6 +42,9 @@ public class UrlController {
         Url url = urlService.findByCode(code).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("URL address with code [%s] not found", code)));
+        if (urlService.updateTotal(code) != 1) {
+            log.error("Не удалось выполнить обновление счетчика при запросе URL по коду ==> {}", code);
+        }
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header("Location", url.getLink()).build();
     }

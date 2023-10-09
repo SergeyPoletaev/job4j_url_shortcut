@@ -152,7 +152,7 @@ class UrlControllerIntegrationTest {
         Url url2 = new Url().setLink("https://user2.ru").setCode("0987654321");
         urlRepository.save(url1);
         urlRepository.save(url2);
-        urlService.findByCode("1234567890");
+        urlService.updateTotal("1234567890");
 
         String pageNum = String.valueOf(0);
         String sizePage = String.valueOf(20);

@@ -30,11 +30,10 @@ public class UrlServiceImpl implements UrlService {
         return urlMapper.urlToCodeDto(urlRepository.save(url));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Url> findByCode(String code) {
-        return urlRepository.updateTotal(code) > 0
-                ? urlRepository.findByCode(code)
-                : Optional.empty();
+        return urlRepository.findByCode(code);
     }
 
     @Transactional(readOnly = true)
@@ -42,5 +41,10 @@ public class UrlServiceImpl implements UrlService {
     public Page<StatisticDto> findAll(Pageable pageable) {
         Page<Url> page = urlRepository.findAll(pageable);
         return page.map(urlMapper::urlToStatisticDto);
+    }
+
+    @Override
+    public int updateTotal(String code) {
+        return urlRepository.updateTotal(code);
     }
 }
